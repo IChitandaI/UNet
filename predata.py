@@ -10,19 +10,6 @@ from glob import glob
 from PIL import Image
 
 
-def resize(img, scale):
-    W, H = img.size
-    new_W = int(W*scale)
-    new_H = int(H*scale)
-    new_img = img.resize((new_W, new_H))
-    a = np.array(new_img)
-    if len(a.shape) == 2:
-        a = np.expand_dims(a, axis=2)
-    a = a.transpose((2, 0, 1))
-    if a.max() > 1:
-        a = a/255
-    return a
-
 
 class Data_set(Dataset):
     def __init__(self, dir_img, dir_mask, scale=1):
@@ -34,6 +21,19 @@ class Data_set(Dataset):
 
     def __len__(self):
         return len(self.name)
+    @classmethod
+    def resize(cls, img, scale):
+        W, H = img.size
+        new_W = int(W*scale)
+        new_H = int(H*scale)
+        new_img = img.resize((new_W, new_H))
+        a = np.array(new_img)
+        if len(a.shape) == 2:
+            a = np.expand_dims(a, axis=2)
+        a = a.transpose((2, 0, 1))
+        if a.max() > 1:
+            a = a/255
+        return a
 
     def __getitem__(self, i):
         x = self.name[i]
@@ -45,8 +45,8 @@ class Data_set(Dataset):
         except:
             print(file_img)
             print(file_mask)
-        img = resize(img, self.scale)
-        mask = resize(mask, self.scale)
+        img = self.resize(img, self.scale)
+        mask = self.resize(mask, self.scale)
 
         return {
             'img': torch.from_numpy(img).type(torch.FloatTensor),

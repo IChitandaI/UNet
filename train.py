@@ -79,6 +79,5 @@ def train(net,
 if __name__ == "__main__":
     net = UNet(n_channels=3, n_classes=1)
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
-    net = UNet(n_channels=3, n_classes=1)
     net.to(device=device)
     train(net=net, device=device)
